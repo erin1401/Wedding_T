@@ -476,33 +476,6 @@
        <h3 class="font-display text-2xl text-amber-100 mb-2">Terima Kasih!</h3>
        <p class="text-amber-100/70">RSVP dan ucapan Anda telah kami terima.</p>
       </div>
-     </div><!-- Wishes Display -->
-     <div class="mt-8">
-      <h3 class="font-display text-xl text-amber-100 text-center mb-6">Ucapan &amp; Doa</h3>
-      <div id="wishes-container" class="space-y-4 max-h-64 overflow-y-auto pr-2">
-       <div class="card-glass rounded-xl p-4">
-        <div class="flex items-start gap-3">
-         <div class="w-10 h-10 rounded-full bg-amber-400/20 flex items-center justify-center flex-shrink-0"><span class="text-amber-400 font-medium">A</span>
-         </div>
-         <div>
-          <p class="text-amber-100 font-medium text-sm">Anisa Rahman</p>
-          <p class="text-amber-100/70 text-sm mt-1">Selamat menempuh hidup baru! Semoga menjadi keluarga yang sakinah, mawaddah, wa rahmah. Barakallahu lakuma 💕</p>
-         </div>
-        </div>
-       </div>
-       <div class="card-glass rounded-xl p-4">
-        <div class="flex items-start gap-3">
-         <div class="w-10 h-10 rounded-full bg-amber-400/20 flex items-center justify-center flex-shrink-0"><span class="text-amber-400 font-medium">B</span>
-         </div>
-         <div>
-          <p class="text-amber-100 font-medium text-sm">Budi Santoso</p>
-          <p class="text-amber-100/70 text-sm mt-1">Happy wedding bro! Semoga langgeng sampai kakek nenek ya! 🎉</p>
-         </div>
-        </div>
-       </div>
-      </div>
-     </div>
-    </div>
    </section><!-- Section 6: Gift / Amplop Digital -->
    <section id="gift" class="section">
     <div class="max-w-2xl mx-auto w-full">
@@ -829,75 +802,50 @@
       existingWishes.forEach(el => el.remove());
     }
     
-    // RSVP Form
-    const rsvpForm = document.getElementById('rsvp-form');
-    if (rsvpForm) {
-      rsvpForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const name = document.getElementById('guest-name').value.trim();
-        const attendance = document.querySelector('input[name="attendance"]:checked').value;
-        const guestCount = parseInt(document.getElementById('guest-count').value);
-        const message = document.getElementById('guest-message').value.trim();
-        
-        if (!name || !message) {
-          showErrorToast('Mohon isi nama dan ucapan terlebih dahulu');
-          return;
-        }
-        
-        // Disable form while submitting
-        const submitBtn = document.querySelector('#rsvp-form button[type="submit"]');
-        const originalText = submitBtn.textContent;
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Mengirim...';
-        
-        if (!window.dataSdk || !isSdkReady) {
-          showErrorToast('Data SDK belum siap. Silakan coba lagi.');
-          submitBtn.disabled = false;
-          submitBtn.textContent = originalText;
-          return;
-        }
-        
-        const result = await window.dataSdk.create({
-          id: `${name}-${Date.now()}`,
-          name: name,
-          attendance: attendance,
-          guest_count: guestCount,
-          message: message,
-          createdAt: new Date().toISOString()
-        });
-        
-        if (result.isOk) {
-          // Show success
-          document.getElementById('rsvp-form').classList.add('hidden');
-          document.getElementById('rsvp-success').classList.remove('hidden');
-          
-          setTimeout(() => {
-            document.getElementById('rsvp-form').classList.remove('hidden');
-            document.getElementById('rsvp-success').classList.add('hidden');
-            document.getElementById('rsvp-form').reset();
-            submitBtn.disabled = false;
-            submitBtn.textContent = originalText;
-          }, 3000);
-        } else {
-          showErrorToast('Gagal mengirim RSVP. Silakan coba lagi.');
-          submitBtn.disabled = false;
-          submitBtn.textContent = originalText;
-        }
-      });
+    const rsvpForm = document.getElementById("rsvp-form");
+
+rsvpForm.addEventListener("submit", async function(e) {
+
+  e.preventDefault();
+
+  const name = document.getElementById("guest-name").value;
+  const attendance = document.querySelector('input[name="attendance"]:checked').value;
+  const guestCount = document.getElementById("guest-count").value;
+  const message = document.getElementById("guest-message").value;
+
+  const data = {
+    name: name,
+    attendance: attendance,
+    guest_count: guestCount,
+    message: message
+  };
+
+  const url = https://script.google.com/macros/s/AKfycbzAmGJ8bIc2nIQEpgUGLJdMJsmvcsTpXc9vrMmEnEgm-uDE7F8JuCT6hS2d6A4Bopdjvw/exec;
+
+  try {
+
+    const response = await fetch(url, {
+      method: "POST",
+      body: JSON.stringify(data)
+    });
+
+    const result = await response.json();
+
+    if(result.status === "success"){
+
+      alert("Terima kasih! RSVP berhasil dikirim");
+
+      document.getElementById("rsvp-form").reset();
+
     }
-    
-    function showErrorToast(message) {
-      const toast = document.createElement('div');
-      toast.className = 'fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-6 py-3 rounded-full text-sm z-50';
-      toast.textContent = message;
-      document.body.appendChild(toast);
-      
-      setTimeout(() => {
-        toast.remove();
-      }, 3000);
-    }
-    
+
+  } catch (error) {
+
+    alert("Gagal mengirim RSVP");
+
+  }
+
+});
     // Copy to Clipboard
     function copyToClipboard(text, button) {
       navigator.clipboard.writeText(text).then(() => {
